@@ -79,14 +79,62 @@ const Dashboard = () => {
           <OngoingCards items={mockOngoingItems} />
         </div>
 
-        {/* Middle Column - Stats Widget */}
-        <div className="xl:col-span-1">
+        {/* Middle Column - Stats Widget and Stats Cards */}
+        <div className="xl:col-span-1 space-y-6">
           <GradientStatWidget 
             value={`+${formattedNetWorth}`}
             subtitle="Total förmögenhet"
             trend={2.78}
             teamMembers={teamMembers}
           />
+          
+          {/* Stats Cards - Desktop Only */}
+          <div className="hidden xl:block space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="glass-card p-4 rounded-2xl"
+            >
+              <h3 className="text-xs font-medium text-muted-foreground mb-1">
+                Månadsförändring
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-positive">+5.2%</span>
+                <span className="text-xs text-muted-foreground">vs föregående månad</span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="glass-card p-4 rounded-2xl"
+            >
+              <h3 className="text-xs font-medium text-muted-foreground mb-1">
+                Årsförändring (YTD)
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-positive">+18.7%</span>
+                <span className="text-xs text-muted-foreground">sedan årets början</span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="glass-card p-4 rounded-2xl"
+            >
+              <h3 className="text-xs font-medium text-muted-foreground mb-1">
+                Bästa position
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold text-primary">Avanza ISK</span>
+                <span className="text-xs text-muted-foreground">+24.1%</span>
+              </div>
+            </motion.div>
+          </div>
         </div>
 
         {/* Right Column - Right Rail */}
@@ -98,12 +146,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Bottom Row - Additional Stats */}
+      {/* Bottom Row - Mobile Stats Cards */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 xl:hidden"
       >
         <div className="glass-card p-6 rounded-2xl">
           <h3 className="text-sm font-medium text-muted-foreground mb-2">
