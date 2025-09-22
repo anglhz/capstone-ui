@@ -21,6 +21,7 @@ export default {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
+          light: "hsl(var(--primary-light))",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
@@ -45,8 +46,13 @@ export default {
         },
         card: {
           DEFAULT: "hsl(var(--card))",
+          secondary: "hsl(var(--card-secondary))",
+          elevated: "hsl(var(--card-elevated))",
           foreground: "hsl(var(--card-foreground))",
         },
+        yellow: "hsl(var(--yellow))",
+        positive: "hsl(var(--positive))",
+        negative: "hsl(var(--negative))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
