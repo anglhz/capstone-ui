@@ -19,6 +19,14 @@ const Accounts = () => {
   const [accounts, setAccounts] = useState<Account[]>(mockAccounts);
   const [newBalance, setNewBalance] = useState<string>('');
   const [selectedAccountId, setSelectedAccountId] = useState<string>('');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [newAccount, setNewAccount] = useState({
+    name: '',
+    type: 'Bank',
+    balance: 0
+  });
 
   const updateAccountBalance = (accountId: string, balance: number) => {
     setAccounts(prev => prev.map(account => 
@@ -35,6 +43,51 @@ const Accounts = () => {
     if (!isNaN(balance) && selectedAccountId) {
       updateAccountBalance(selectedAccountId, balance);
     }
+  };
+
+  const handleAddAccount = () => {
+    if (newAccount.name.trim()) {
+      const getDefaultColor = (type: string) => {
+        switch (type) {
+          case 'Bank': return '#22C55E';
+          case 'Avanza ISK': return '#7C3AED';
+          case 'Krypto': return '#F59E0B';
+          default: return '#64748B';
+        }
+      };
+      
+      const account: Account = {
+        id: `account-${Date.now()}`,
+        name: newAccount.name,
+        type: newAccount.type as any,
+        balance: newAccount.balance,
+        color: getDefaultColor(newAccount.type)
+      };
+      setAccounts(prev => [...prev, account]);
+      setNewAccount({ name: '', type: 'Bank', balance: 0 });
+      setIsAddDialogOpen(false);
+    }
+  };
+
+  const handleEditAccount = () => {
+    if (editingAccount && editingAccount.name.trim()) {
+      setAccounts(prev => prev.map(account => 
+        account.id === editingAccount.id 
+          ? { ...editingAccount }
+          : account
+      ));
+      setEditingAccount(null);
+      setIsEditDialogOpen(false);
+    }
+  };
+
+  const handleDeleteAccount = (accountId: string) => {
+    setAccounts(prev => prev.filter(account => account.id !== accountId));
+  };
+
+  const openEditDialog = (account: Account) => {
+    setEditingAccount({ ...account });
+    setIsEditDialogOpen(true);
   };
 
   const getAccountTypeColor = (type: string) => {
@@ -69,10 +122,70 @@ const Accounts = () => {
           </p>
         </div>
 
-        <Button className="gradient-primary text-primary-foreground">
-          <Plus className="h-4 w-4 mr-2" />
-          Nytt konto
-        </Button>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="gradient-primary text-primary-foreground">
+              <Plus className="h-4 w-4 mr-2" />
+              Nytt konto
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="glass-card">
+            <DialogHeader>
+              <DialogTitle>Lägg till nytt konto</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="accountName">Kontonamn</Label>
+                <Input
+                  id="accountName"
+                  placeholder="T.ex. Sparkonto"
+                  value={newAccount.name}
+                  onChange={(e) => setNewAccount(prev => ({ ...prev, name: e.target.value }))}
+                  className="glass-card"
+                />
+              </div>
+              <div>
+                <Label htmlFor="accountType">Kontotyp</Label>
+                <select
+                  id="accountType"
+                  value={newAccount.type}
+                  onChange={(e) => setNewAccount(prev => ({ ...prev, type: e.target.value }))}
+                  className="w-full p-2 rounded-md border border-border bg-background text-foreground"
+                >
+                  <option value="Bank">Bank</option>
+                  <option value="Avanza ISK">Avanza ISK</option>
+                  <option value="Krypto">Krypto</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="accountBalance">Startsaldo (SEK)</Label>
+                <Input
+                  id="accountBalance"
+                  type="number"
+                  placeholder="0"
+                  value={newAccount.balance}
+                  onChange={(e) => setNewAccount(prev => ({ ...prev, balance: parseFloat(e.target.value) || 0 }))}
+                  className="glass-card"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleAddAccount}
+                  className="flex-1 bg-positive text-positive-foreground hover:bg-positive/90"
+                >
+                  Lägg till
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setIsAddDialogOpen(false)}
+                >
+                  Avbryt
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </motion.div>
 
       {/* Summary Card */}
@@ -141,11 +254,14 @@ const Accounts = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="glass-card">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => openEditDialog(account)}>
                         <Edit className="mr-2 h-4 w-4" />
                         Redigera
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-negative">
+                      <DropdownMenuItem 
+                        className="text-negative"
+                        onClick={() => handleDeleteAccount(account.id)}
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Ta bort
                       </DropdownMenuItem>
@@ -224,6 +340,66 @@ const Accounts = () => {
           </motion.div>
         ))}
       </div>
+
+      {/* Edit Account Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="glass-card">
+          <DialogHeader>
+            <DialogTitle>Redigera konto</DialogTitle>
+          </DialogHeader>
+          {editingAccount && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="editAccountName">Kontonamn</Label>
+                <Input
+                  id="editAccountName"
+                  value={editingAccount.name}
+                  onChange={(e) => setEditingAccount(prev => prev ? ({ ...prev, name: e.target.value }) : null)}
+                  className="glass-card"
+                />
+              </div>
+              <div>
+                <Label htmlFor="editAccountType">Kontotyp</Label>
+                <select
+                  id="editAccountType"
+                  value={editingAccount.type}
+                  onChange={(e) => setEditingAccount(prev => prev ? ({ ...prev, type: e.target.value as any }) : null)}
+                  className="w-full p-2 rounded-md border border-border bg-background text-foreground"
+                >
+                  <option value="Bank">Bank</option>
+                  <option value="Avanza ISK">Avanza ISK</option>
+                  <option value="Krypto">Krypto</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="editAccountBalance">Saldo (SEK)</Label>
+                <Input
+                  id="editAccountBalance"
+                  type="number"
+                  value={editingAccount.balance}
+                  onChange={(e) => setEditingAccount(prev => prev ? ({ ...prev, balance: parseFloat(e.target.value) || 0 }) : null)}
+                  className="glass-card"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleEditAccount}
+                  className="flex-1 bg-positive text-positive-foreground hover:bg-positive/90"
+                >
+                  Spara ändringar
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => setIsEditDialogOpen(false)}
+                >
+                  Avbryt
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
