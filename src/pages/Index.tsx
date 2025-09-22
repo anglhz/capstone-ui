@@ -4,14 +4,12 @@ import { DatePills } from '@/components/ui/date-pills';
 import { SegmentedSwitch } from '@/components/ui/segmented-switch';
 import { NetWorthChart } from '@/components/ui/net-worth-chart';
 import { OngoingCards } from '@/components/ui/ongoing-cards';
-import { RightRail } from '@/components/ui/right-rail';
+
 import { GradientStatWidget } from '@/components/ui/gradient-stat-widget';
 import { 
   initializeData, 
   generateIntradayData, 
   mockOngoingItems,
-  mockUpcomingEvents,
-  mockPauseItems,
   formatCompactSEK 
 } from '@/lib/data';
 
@@ -72,7 +70,7 @@ const Dashboard = () => {
       </motion.div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Left Column - Chart and Ongoing */}
         <div className="xl:col-span-2 space-y-6">
           <NetWorthChart data={chartData} />
@@ -137,13 +135,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Right Column - Right Rail */}
-        <div className="xl:col-span-1">
-          <RightRail 
-            upcomingEvents={mockUpcomingEvents}
-            pauseItems={mockPauseItems}
-          />
-        </div>
       </div>
 
       {/* Bottom Row - Mobile Stats Cards */}
