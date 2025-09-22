@@ -8,23 +8,28 @@ import { OngoingCards } from '@/components/ui/ongoing-cards';
 import { GradientStatWidget } from '@/components/ui/gradient-stat-widget';
 import { 
   initializeData, 
-  generateIntradayData, 
+  generateTimeSeriesData, 
+  getDateRange,
+  formatDateForPill,
   mockOngoingItems,
   formatCompactSEK 
 } from '@/lib/data';
 
 const Dashboard = () => {
-  const [selectedDay, setSelectedDay] = useState(13);
-  const [selectedSegment, setSelectedSegment] = useState('Dag');
-  const [chartData, setChartData] = useState(generateIntradayData());
+  const [selectedSegment, setSelectedSegment] = useState<'Dag' | 'Vecka' | 'Månad'>('Dag');
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [snapshots] = useState(() => initializeData());
 
   // Calculate current net worth
   const currentNetWorth = snapshots[snapshots.length - 1]?.netWorth || 0;
   const formattedNetWorth = formatCompactSEK(currentNetWorth);
 
-  // Generate day range (1-13 for current day selection)
-  const dayRange = Array.from({ length: 13 }, (_, i) => i + 1);
+  // Generate date ranges and labels based on selected period
+  const dateRange = getDateRange(selectedSegment);
+  const dateLabels = dateRange.map(date => formatDateForPill(date, selectedSegment));
+  
+  // Generate chart data based on selected period and date
+  const chartData = generateTimeSeriesData(selectedSegment, selectedDate);
 
   // Team members for stat widget
   const teamMembers = [
@@ -34,10 +39,45 @@ const Dashboard = () => {
     { id: '4', name: 'Marcus', avatar: '/api/placeholder/24/24' },
   ];
 
+  // Update selected date when period changes
   useEffect(() => {
-    // Regenerate chart data when segment changes
-    setChartData(generateIntradayData());
+    const newDateRange = getDateRange(selectedSegment);
+    setSelectedDate(newDateRange[newDateRange.length - 1]);
   }, [selectedSegment]);
+
+  // Generate chart title and subtitle based on selection
+  const getChartInfo = () => {
+    const today = new Date();
+    const isToday = selectedDate.toDateString() === today.toDateString();
+    
+    if (selectedSegment === 'Dag') {
+      return {
+        title: 'Förmögenhetsutveckling',
+        subtitle: isToday 
+          ? 'Idag • Senaste 24 timmarna' 
+          : `${selectedDate.toLocaleDateString('sv-SE', { 
+              weekday: 'long', 
+              day: 'numeric', 
+              month: 'long' 
+            })} • 24 timmar`
+      };
+    } else if (selectedSegment === 'Vecka') {
+      return {
+        title: 'Förmögenhetsutveckling',
+        subtitle: `Vecka ${formatDateForPill(selectedDate, 'Vecka')} • 7 dagar`
+      };
+    } else {
+      return {
+        title: 'Förmögenhetsutveckling',
+        subtitle: `${selectedDate.toLocaleDateString('sv-SE', { 
+          month: 'long', 
+          year: 'numeric' 
+        })} • Månadsvy`
+      };
+    }
+  };
+
+  const chartInfo = getChartInfo();
 
   return (
     <div className="space-y-6">
@@ -58,13 +98,15 @@ const Dashboard = () => {
 
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <DatePills 
-            days={dayRange} 
-            onDaySelect={setSelectedDay}
+            dates={dateRange}
+            labels={dateLabels}
+            selectedDate={selectedDate}
+            onDateSelect={setSelectedDate}
           />
           <SegmentedSwitch 
             options={['Dag', 'Vecka', 'Månad']}
             defaultValue={selectedSegment}
-            onValueChange={setSelectedSegment}
+            onValueChange={(value) => setSelectedSegment(value as 'Dag' | 'Vecka' | 'Månad')}
           />
         </div>
       </motion.div>
@@ -73,7 +115,11 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Left Column - Chart and Ongoing */}
         <div className="xl:col-span-2 space-y-6">
-          <NetWorthChart data={chartData} />
+          <NetWorthChart 
+            data={chartData} 
+            title={chartInfo.title}
+            subtitle={chartInfo.subtitle}
+          />
           <OngoingCards items={mockOngoingItems} />
         </div>
 

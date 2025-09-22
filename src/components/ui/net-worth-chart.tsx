@@ -19,6 +19,8 @@ interface ChartData {
 
 interface NetWorthChartProps {
   data: ChartData[];
+  title?: string;
+  subtitle?: string;
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -56,7 +58,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-export function NetWorthChart({ data }: NetWorthChartProps) {
+export function NetWorthChart({ data, title = "Förmögenhetsutveckling", subtitle }: NetWorthChartProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -65,11 +67,13 @@ export function NetWorthChart({ data }: NetWorthChartProps) {
     >
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-foreground mb-2">
-          Förmögenhetsutveckling
+          {title}
         </h3>
-        <p className="text-sm text-muted-foreground">
-          Idag • Senaste 13 timmarna
-        </p>
+        {subtitle && (
+          <p className="text-sm text-muted-foreground">
+            {subtitle}
+          </p>
+        )}
       </div>
       
       <div className="h-64">

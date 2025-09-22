@@ -81,25 +81,124 @@ export const generateHistoricalData = (): SnapshotData[] => {
   return data;
 };
 
-// Generate intraday data for charts
-export const generateIntradayData = (): TimeSeriesData[] => {
+// Generate time series data based on period type and selected date
+export const generateTimeSeriesData = (
+  period: 'Dag' | 'Vecka' | 'Månad', 
+  selectedDate: Date
+): TimeSeriesData[] => {
   const data: TimeSeriesData[] = [];
-  const now = new Date();
-  const startValue = 4100000;
+  const baseValue = 4100000;
   
-  for (let i = 0; i < 13; i++) {
-    const time = new Date(now.getTime() - (12 - i) * 60 * 60 * 1000);
-    const variance = (Math.random() - 0.5) * 0.02;
-    const growth = 1 + variance;
-    
-    data.push({
-      time: time.toISOString(),
-      value: Math.round(startValue * growth * (1 + i * 0.001)),
-      benchmark: Math.round(startValue * 1.005 * (1 + i * 0.0008)),
-    });
+  if (period === 'Dag') {
+    // Generate hourly data for selected day
+    for (let i = 0; i < 24; i++) {
+      const time = new Date(selectedDate);
+      time.setHours(i, 0, 0, 0);
+      
+      const variance = (Math.random() - 0.5) * 0.015;
+      const hourlyTrend = Math.sin(i / 24 * Math.PI) * 0.005; // Simulate daily pattern
+      
+      data.push({
+        time: time.toISOString(),
+        value: Math.round(baseValue * (1 + variance + hourlyTrend)),
+        benchmark: Math.round(baseValue * (1 + hourlyTrend * 0.8)),
+      });
+    }
+  } else if (period === 'Vecka') {
+    // Generate daily data for 7 days ending on selected date
+    for (let i = 6; i >= 0; i--) {
+      const time = new Date(selectedDate);
+      time.setDate(time.getDate() - i);
+      time.setHours(12, 0, 0, 0);
+      
+      const variance = (Math.random() - 0.5) * 0.03;
+      const weeklyTrend = (6 - i) * 0.002;
+      
+      data.push({
+        time: time.toISOString(),
+        value: Math.round(baseValue * (1 + variance + weeklyTrend)),
+        benchmark: Math.round(baseValue * (1 + weeklyTrend * 0.9)),
+      });
+    }
+  } else if (period === 'Månad') {
+    // Generate weekly data for 4 weeks ending on selected date
+    for (let i = 3; i >= 0; i--) {
+      const time = new Date(selectedDate);
+      time.setDate(time.getDate() - i * 7);
+      time.setHours(12, 0, 0, 0);
+      
+      const variance = (Math.random() - 0.5) * 0.04;
+      const monthlyTrend = (3 - i) * 0.008;
+      
+      data.push({
+        time: time.toISOString(),
+        value: Math.round(baseValue * (1 + variance + monthlyTrend)),
+        benchmark: Math.round(baseValue * (1 + monthlyTrend * 0.85)),
+      });
+    }
   }
   
   return data;
+};
+
+// Generate intraday data for charts (backwards compatibility)
+export const generateIntradayData = (): TimeSeriesData[] => {
+  return generateTimeSeriesData('Dag', new Date());
+};
+
+// Generate date ranges for DatePills based on period
+export const getDateRange = (period: 'Dag' | 'Vecka' | 'Månad'): Date[] => {
+  const dates: Date[] = [];
+  const now = new Date();
+  
+  if (period === 'Dag') {
+    // Last 7 days
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      dates.push(date);
+    }
+  } else if (period === 'Vecka') {
+    // Last 4 weeks (ending on each Sunday)
+    for (let i = 3; i >= 0; i--) {
+      const date = new Date(now);
+      const dayOfWeek = date.getDay();
+      const daysToSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+      date.setDate(date.getDate() + daysToSunday - i * 7);
+      dates.push(date);
+    }
+  } else if (period === 'Månad') {
+    // Last 6 months
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now);
+      date.setMonth(date.getMonth() - i);
+      date.setDate(1); // First day of month
+      dates.push(date);
+    }
+  }
+  
+  return dates;
+};
+
+// Format date for DatePills display
+export const formatDateForPill = (date: Date, period: 'Dag' | 'Vecka' | 'Månad'): string => {
+  if (period === 'Dag') {
+    return date.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' });
+  } else if (period === 'Vecka') {
+    return `V${getWeekNumber(date)}`;
+  } else if (period === 'Månad') {
+    return date.toLocaleDateString('sv-SE', { month: 'short' });
+  }
+  return date.toDateString();
+};
+
+// Helper function to get week number
+export const getWeekNumber = (date: Date): number => {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 };
 
 // Mock ongoing items
