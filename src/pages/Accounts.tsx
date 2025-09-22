@@ -10,10 +10,32 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { mockAccounts, formatSEK, Account } from '@/lib/data';
 
 const Accounts = () => {
   const [accounts, setAccounts] = useState<Account[]>(mockAccounts);
+  const [newBalance, setNewBalance] = useState<string>('');
+  const [selectedAccountId, setSelectedAccountId] = useState<string>('');
+
+  const updateAccountBalance = (accountId: string, balance: number) => {
+    setAccounts(prev => prev.map(account => 
+      account.id === accountId 
+        ? { ...account, balance }
+        : account
+    ));
+    setNewBalance('');
+    setSelectedAccountId('');
+  };
+
+  const handleBalanceSubmit = () => {
+    const balance = parseFloat(newBalance);
+    if (!isNaN(balance) && selectedAccountId) {
+      updateAccountBalance(selectedAccountId, balance);
+    }
+  };
 
   const getAccountTypeColor = (type: string) => {
     switch (type) {
@@ -144,12 +166,57 @@ const Accounts = () => {
                   </div>
                   
                   <div className="pt-4 border-t border-border/50">
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-sm mb-3">
                       <span className="text-muted-foreground">Andel av totalt:</span>
                       <span className="font-medium text-foreground">
                         {((account.balance / totalBalance) * 100).toFixed(1)}%
                       </span>
                     </div>
+                    
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full bg-positive/10 text-positive border-positive/20 hover:bg-positive/20"
+                          onClick={() => setSelectedAccountId(account.id)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Uppdatera saldo
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="glass-card">
+                        <DialogHeader>
+                          <DialogTitle>Uppdatera saldo för {account.name}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="balance">Nytt saldo (SEK)</Label>
+                            <Input
+                              id="balance"
+                              type="number"
+                              placeholder="0"
+                              value={newBalance}
+                              onChange={(e) => setNewBalance(e.target.value)}
+                              className="glass-card"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              onClick={handleBalanceSubmit}
+                              className="flex-1 bg-positive text-positive-foreground hover:bg-positive/90"
+                            >
+                              Spara
+                            </Button>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" className="flex-1">
+                                Avbryt
+                              </Button>
+                            </DialogTrigger>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
               </CardContent>
