@@ -57,7 +57,7 @@ export function SidebarNav() {
   return (
     <Sidebar 
       collapsible="icon"
-      className="border-r border-sidebar-border bg-sidebar"
+      className="border-r border-sidebar-border bg-sidebar flex-shrink-0"
     >
       <SidebarContent className="p-4">
         {/* Logo/Brand */}
