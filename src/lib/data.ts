@@ -44,106 +44,25 @@ export interface PauseItem {
   avatar: string;
 }
 
-// Mock accounts
-export const mockAccounts: Account[] = [
-  { id: '1', name: 'Handelsbanken', type: 'Bank', balance: 1250000, color: '#22C55E' },
-  { id: '2', name: 'Avanza ISK', type: 'Avanza ISK', balance: 2400000, color: '#7C3AED' },
-  { id: '3', name: 'Krypto Portfolio', type: 'Krypto', balance: 450000, color: '#F59E0B' },
-];
+// Mock accounts - cleaned up
+export const mockAccounts: Account[] = [];
 
-// Generate 24 months of historical data
+// Generate 24 months of historical data - cleaned up
 export const generateHistoricalData = (): SnapshotData[] => {
-  const data: SnapshotData[] = [];
-  const now = new Date();
-  
-  for (let i = 23; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    
-    // Simulate growth with some volatility
-    const baseGrowth = 1 + (0.03 + Math.random() * 0.04 - 0.02) * (23 - i) / 23;
-    
-    const accounts = {
-      'Bank': Math.round(1000000 * baseGrowth * (0.9 + Math.random() * 0.2)),
-      'Avanza ISK': Math.round(2000000 * baseGrowth * (0.9 + Math.random() * 0.2)),
-      'Krypto': Math.round(400000 * baseGrowth * (0.8 + Math.random() * 0.4)),
-    };
-    
-    const netWorth = Object.values(accounts).reduce((sum, val) => sum + val, 0);
-    
-    data.push({
-      period,
-      netWorth,
-      accounts,
-    });
-  }
-  
-  return data;
+  return [];
 };
 
-// Generate time series data based on period type and selected date
+// Generate time series data based on period type and selected date - cleaned up
 export const generateTimeSeriesData = (
   period: 'Dag' | 'Vecka' | 'Månad', 
   selectedDate: Date
 ): TimeSeriesData[] => {
-  const data: TimeSeriesData[] = [];
-  const baseValue = 4100000;
-  
-  if (period === 'Dag') {
-    // Generate hourly data for selected day
-    for (let i = 0; i < 24; i++) {
-      const time = new Date(selectedDate);
-      time.setHours(i, 0, 0, 0);
-      
-      const variance = (Math.random() - 0.5) * 0.015;
-      const hourlyTrend = Math.sin(i / 24 * Math.PI) * 0.005; // Simulate daily pattern
-      
-      data.push({
-        time: time.toISOString(),
-        value: Math.round(baseValue * (1 + variance + hourlyTrend)),
-        benchmark: Math.round(baseValue * (1 + hourlyTrend * 0.8)),
-      });
-    }
-  } else if (period === 'Vecka') {
-    // Generate daily data for 7 days ending on selected date
-    for (let i = 6; i >= 0; i--) {
-      const time = new Date(selectedDate);
-      time.setDate(time.getDate() - i);
-      time.setHours(12, 0, 0, 0);
-      
-      const variance = (Math.random() - 0.5) * 0.03;
-      const weeklyTrend = (6 - i) * 0.002;
-      
-      data.push({
-        time: time.toISOString(),
-        value: Math.round(baseValue * (1 + variance + weeklyTrend)),
-        benchmark: Math.round(baseValue * (1 + weeklyTrend * 0.9)),
-      });
-    }
-  } else if (period === 'Månad') {
-    // Generate weekly data for 4 weeks ending on selected date
-    for (let i = 3; i >= 0; i--) {
-      const time = new Date(selectedDate);
-      time.setDate(time.getDate() - i * 7);
-      time.setHours(12, 0, 0, 0);
-      
-      const variance = (Math.random() - 0.5) * 0.04;
-      const monthlyTrend = (3 - i) * 0.008;
-      
-      data.push({
-        time: time.toISOString(),
-        value: Math.round(baseValue * (1 + variance + monthlyTrend)),
-        benchmark: Math.round(baseValue * (1 + monthlyTrend * 0.85)),
-      });
-    }
-  }
-  
-  return data;
+  return [];
 };
 
-// Generate intraday data for charts (backwards compatibility)
+// Generate intraday data for charts (backwards compatibility) - cleaned up
 export const generateIntradayData = (): TimeSeriesData[] => {
-  return generateTimeSeriesData('Dag', new Date());
+  return [];
 };
 
 // Generate date ranges for DatePills based on period
@@ -229,13 +148,13 @@ export const loadFromLocalStorage = (key: string, defaultValue: any = null) => {
   }
 };
 
-// Initialize data with localStorage
+// Initialize data with localStorage - cleaned up
 export const initializeData = () => {
   const existingSnapshots = loadFromLocalStorage('financial-snapshots');
   if (!existingSnapshots) {
-    const historicalData = generateHistoricalData();
-    saveToLocalStorage('financial-snapshots', historicalData);
-    return historicalData;
+    const emptyData: SnapshotData[] = [];
+    saveToLocalStorage('financial-snapshots', emptyData);
+    return emptyData;
   }
   return existingSnapshots;
 };
