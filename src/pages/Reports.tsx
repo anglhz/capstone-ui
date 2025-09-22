@@ -31,7 +31,7 @@ const Reports = () => {
           </p>
         </div>
 
-        <Button variant="outline">
+        <Button variant="outline" onClick={() => window.print()}>
           <Printer className="h-4 w-4 mr-2" />
           Skriv ut
         </Button>
