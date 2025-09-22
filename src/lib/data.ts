@@ -201,74 +201,14 @@ export const getWeekNumber = (date: Date): number => {
   return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
 };
 
-// Mock ongoing items
-export const mockOngoingItems: OngoingItem[] = [
-  {
-    id: '1',
-    name: 'Portfolio Rebalansering',
-    tid: '14:30',
-    badges: ['Avanza', 'Hög prioritet'],
-    dots: ['active', 'warning'],
-    avatar: '/api/placeholder/32/32',
-  },
-  {
-    id: '2', 
-    name: 'Månadsrapport Q4',
-    tid: '16:00',
-    badges: ['Analys', 'Deadline'],
-    dots: ['active'],
-    avatar: '/api/placeholder/32/32',
-  },
-  {
-    id: '3',
-    name: 'Krypto övervakning',
-    tid: 'Pågående',
-    badges: ['BTC', 'ETH'],
-    dots: ['active', 'success'],
-    avatar: '/api/placeholder/32/32',
-  },
-];
+// Mock ongoing items - cleaned up
+export const mockOngoingItems: OngoingItem[] = [];
 
-// Mock upcoming events
-export const mockUpcomingEvents: Event[] = [
-  {
-    id: '1',
-    name: 'Spargruppsmöte',
-    time: '09:00',
-    avatar: '/api/placeholder/24/24',
-    type: 'meeting',
-  },
-  {
-    id: '2',
-    name: 'Kvartalsrapport',
-    time: '11:30', 
-    avatar: '/api/placeholder/24/24',
-    type: 'deadline',
-  },
-  {
-    id: '3',
-    name: 'Portföljöversyn',
-    time: '15:00',
-    avatar: '/api/placeholder/24/24',
-    type: 'meeting',
-  },
-];
+// Mock upcoming events - cleaned up
+export const mockUpcomingEvents: Event[] = [];
 
-// Mock pause items
-export const mockPauseItems: PauseItem[] = [
-  {
-    id: '1',
-    name: 'Lunchpaus',
-    timeLeft: '23 min',
-    avatar: '/api/placeholder/24/24',
-  },
-  {
-    id: '2',
-    name: 'Analysverktyg',
-    timeLeft: '1h 15m',
-    avatar: '/api/placeholder/24/24',
-  },
-];
+// Mock pause items - cleaned up
+export const mockPauseItems: PauseItem[] = [];
 
 // Local storage helpers
 export const saveToLocalStorage = (key: string, data: any) => {

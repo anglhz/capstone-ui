@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { DatePills } from '@/components/ui/date-pills';
 import { SegmentedSwitch } from '@/components/ui/segmented-switch';
 import { NetWorthChart } from '@/components/ui/net-worth-chart';
-import { OngoingCards } from '@/components/ui/ongoing-cards';
 
 import { GradientStatWidget } from '@/components/ui/gradient-stat-widget';
 import { 
@@ -11,7 +10,6 @@ import {
   generateTimeSeriesData, 
   getDateRange,
   formatDateForPill,
-  mockOngoingItems,
   formatCompactSEK 
 } from '@/lib/data';
 
@@ -113,14 +111,13 @@ const Dashboard = () => {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Left Column - Chart and Ongoing */}
+        {/* Left Column - Chart */}
         <div className="xl:col-span-2 space-y-6">
           <NetWorthChart 
             data={chartData} 
             title={chartInfo.title}
             subtitle={chartInfo.subtitle}
           />
-          <OngoingCards items={mockOngoingItems} />
         </div>
 
         {/* Middle Column - Stats Widget and Stats Cards */}
