@@ -29,7 +29,42 @@ function MiniList({
     return type === 'events' ? Calendar : Pause;
   };
   const IconComponent = getIcon();
-  return;
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-card rounded-lg border p-4"
+    >
+      <div className="flex items-center gap-2 mb-3">
+        <IconComponent className="h-4 w-4 text-muted-foreground" />
+        <h3 className="font-medium text-sm">{title}</h3>
+      </div>
+      <div className="space-y-3">
+        {items.map((item) => (
+          <div key={item.id} className="flex items-center gap-3">
+            <Avatar className="h-6 w-6">
+              <AvatarImage src={item.avatar} />
+              <AvatarFallback className="text-xs">
+                {item.name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium truncate">{item.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {type === 'events' ? (item as Event).time : (item as PauseItem).timeLeft}
+              </p>
+            </div>
+            {type === 'events' && (
+              <Badge variant="outline" className="text-xs">
+                {(item as Event).type}
+              </Badge>
+            )}
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
 }
 interface RightRailProps {
   upcomingEvents: Event[];
